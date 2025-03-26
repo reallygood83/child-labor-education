@@ -1,27 +1,77 @@
+// Firebase 설정
+const firebaseConfig = {
+    // Firebase 콘솔에서 가져온 설정값을 여기에 넣으세요
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Firebase 초기화
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 로그인 상태 확인
+    auth.onAuthStateChanged(function(user) {
+        if (user) {
+            // 로그인된 경우 저장된 데이터 불러오기
+            loadSavedData(user.uid);
+        } else {
+            // 로그인되지 않은 경우 로그인 요청
+            requestLogin();
+        }
+    });
+
     // 저장하기 버튼 기능
     const saveButtons = document.querySelectorAll('.save-btn');
     saveButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('저장하기 위해서는 로그인이 필요합니다.');
+                return;
+            }
+
             const targets = this.getAttribute('data-target').split(',');
+            const data = {};
             
             targets.forEach(target => {
                 const element = document.getElementById(target);
                 if (element) {
-                    // 실제로는 서버에 데이터를 저장하거나 localStorage에 저장할 수 있습니다
-                    // 여기서는 간단히 저장 성공 애니메이션만 보여줍니다
-                    localStorage.setItem(target, element.value);
+                    data[target] = element.value;
                 }
             });
             
-            // 저장 성공 애니메이션
-            this.classList.add('save-success');
-            setTimeout(() => {
-                this.classList.remove('save-success');
-            }, 1000);
-            
-            // 저장 완료 메시지
-            alert('입력하신 내용이 저장되었습니다.');
+            try {
+                // Firestore에 데이터 저장
+                await db.collection('userData').doc(user.uid).set(data, { merge: true });
+                
+                // 저장 성공 애니메이션
+                this.classList.add('save-success');
+                setTimeout(() => {
+                    this.classList.remove('save-success');
+                }, 1000);
+
+                // 저장 형식 선택 다이얼로그 표시
+                const saveFormat = await showSaveFormatDialog();
+                if (saveFormat) {
+                    const containerId = this.closest('.activity-container').id;
+                    if (saveFormat === 'pdf') {
+                        await saveAsPDF(containerId, `학습내용_${containerId}`);
+                    } else if (saveFormat === 'image') {
+                        await saveAsImage(containerId, `학습내용_${containerId}`);
+                    }
+                }
+                
+                alert('입력하신 내용이 저장되었습니다.');
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('저장 중 오류가 발생했습니다. 다시 시도해 주세요.');
+            }
         });
     });
     
@@ -34,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
         card.addEventListener('click', function() {
             const word = this.getAttribute('data-word');
             
-            // 이미 선택된 단어라면 선택 해제
             if (this.classList.contains('selected')) {
                 this.classList.remove('selected');
                 const index = selectedWords.indexOf(word);
@@ -42,20 +91,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     selectedWords.splice(index, 1);
                 }
             } 
-            // 최대 3개까지만 선택 가능
             else if (selectedWords.length < 3) {
                 this.classList.add('selected');
                 selectedWords.push(word);
             }
             
-            // 선택한 단어를 입력 필드에 표시
             for (let i = 0; i < Math.min(selectedWords.length, 3); i++) {
                 if (selectedWordInputs[i]) {
                     selectedWordInputs[i].value = selectedWords[i];
                 }
             }
             
-            // 선택 해제된 경우 빈칸으로
             for (let i = selectedWords.length; i < 3; i++) {
                 if (selectedWordInputs[i]) {
                     selectedWordInputs[i].value = '';
@@ -63,17 +109,122 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // 페이지 로드 시 저장된 데이터 불러오기
-    function loadSavedData() {
-        const inputElements = document.querySelectorAll('input[id], textarea[id]');
-        inputElements.forEach(element => {
-            const savedValue = localStorage.getItem(element.id);
-            if (savedValue) {
-                element.value = savedValue;
-            }
+});
+
+// 로그인 요청 함수
+function requestLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log('로그인 성공:', result.user);
+        })
+        .catch((error) => {
+            console.error('로그인 실패:', error);
+            alert('로그인에 실패했습니다. 다시 시도해 주세요.');
         });
+}
+
+// 저장된 데이터 불러오기 함수
+async function loadSavedData(userId) {
+    try {
+        const doc = await db.collection('userData').doc(userId).get();
+        if (doc.exists) {
+            const data = doc.data();
+            Object.keys(data).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = data[key];
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
     }
-    
-    loadSavedData();
-}); 
+}
+
+// PDF 생성 및 저장 함수
+async function saveAsPDF(elementId, fileName) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    try {
+        // HTML을 캔버스로 변환
+        const canvas = await html2canvas(element, {
+            scale: 2, // 고해상도
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+
+        // PDF 생성
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const imgWidth = 210; // A4 너비
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+        // PDF 저장
+        pdf.save(`${fileName}_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+        console.error('PDF 생성 중 오류:', error);
+        alert('PDF 저장 중 오류가 발생했습니다.');
+    }
+}
+
+// 이미지로 저장 함수
+async function saveAsImage(elementId, fileName) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    try {
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+
+        // 이미지 다운로드 링크 생성
+        const link = document.createElement('a');
+        link.download = `${fileName}_${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (error) {
+        console.error('이미지 저장 중 오류:', error);
+        alert('이미지 저장 중 오류가 발생했습니다.');
+    }
+}
+
+// 저장 형식 선택 다이얼로그
+function showSaveFormatDialog() {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.className = 'save-format-dialog';
+        dialog.innerHTML = `
+            <div class="dialog-content">
+                <h3>저장 형식 선택</h3>
+                <p>학습 내용을 어떤 형식으로 저장하시겠습니까?</p>
+                <div class="dialog-buttons">
+                    <button class="btn" data-format="pdf">PDF로 저장</button>
+                    <button class="btn" data-format="image">이미지로 저장</button>
+                    <button class="btn cancel">취소</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        const buttons = dialog.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const format = button.dataset.format;
+                dialog.remove();
+                resolve(format);
+            });
+        });
+    });
+} 
