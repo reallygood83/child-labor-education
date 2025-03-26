@@ -239,7 +239,7 @@ document.querySelectorAll('.content-image, .view-full-btn').forEach(element => {
     element.addEventListener('click', function(e) {
         if (e.target.classList.contains('view-full-btn')) {
             // 크게 보기 버튼 클릭 시 해당 이미지의 src 가져오기
-            const img = e.target.previousElementSibling;
+            const img = e.target.parentElement.querySelector('.content-image');
             modalImg.src = img.src;
         } else {
             // 이미지 클릭 시 해당 이미지의 src 가져오기
