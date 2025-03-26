@@ -166,25 +166,98 @@ h1, h2, h3 {
     padding: 20px;
     margin: 20px 0;
     position: relative;
-    min-height: 100px;
+    height: 300px;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.image-placeholder img {
-    display: block;
-    margin: 0 auto;
+.content-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    cursor: pointer;
     transition: transform 0.3s ease;
 }
 
-.image-placeholder img:hover {
-    transform: scale(1.02);
+.content-image:hover {
+    transform: scale(1.05);
 }
 
-.image-placeholder input[type="file"] {
+.view-full-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
     background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.view-full-btn:hover {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    overflow: auto;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 10px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #bbb;
+}
+
+/* 태블릿 최적화 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .activity-container {
+        padding: 15px;
+    }
+    
+    .image-placeholder {
+        height: 200px;
+    }
+    
+    .view-full-btn {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
 }
 
 footer {
@@ -204,17 +277,6 @@ footer {
 
 .save-success {
     animation: saveSuccess 1s;
-}
-
-/* 반응형 디자인을 위한 미디어 쿼리 */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-    
-    .activity-container {
-        padding: 15px;
-    }
 }
 
 /* 저장 형식 선택 다이얼로그 스타일 */
