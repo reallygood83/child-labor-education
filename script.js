@@ -227,4 +227,43 @@ function showSaveFormatDialog() {
             });
         });
     });
-} 
+}
+
+// 이미지 팝업 기능
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImage');
+const closeBtn = document.getElementsByClassName('close')[0];
+
+// 모든 이미지와 크게 보기 버튼에 이벤트 리스너 추가
+document.querySelectorAll('.content-image, .view-full-btn').forEach(element => {
+    element.addEventListener('click', function(e) {
+        if (e.target.classList.contains('view-full-btn')) {
+            // 크게 보기 버튼 클릭 시 해당 이미지의 src 가져오기
+            const img = e.target.previousElementSibling;
+            modalImg.src = img.src;
+        } else {
+            // 이미지 클릭 시 해당 이미지의 src 가져오기
+            modalImg.src = e.target.src;
+        }
+        modal.style.display = 'block';
+    });
+});
+
+// 닫기 버튼 클릭 시 모달 닫기
+closeBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+});
+
+// 모달 바깥 클릭 시 모달 닫기
+modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.style.display === 'block') {
+        modal.style.display = 'none';
+    }
+}); 
