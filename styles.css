@@ -1,0 +1,202 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+.intro {
+    background-color: #eaf4fc;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 5px solid #3498db;
+}
+
+.activity-container {
+    background-color: white;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.activity-title {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.court-scene {
+    background-color: #f7f9fa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.scene-header {
+    text-align: center;
+    background-color: #f0f7ff;
+    padding: 10px;
+    margin: -20px -20px 20px -20px;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.dialogue {
+    margin-bottom: 15px;
+    padding-left: 15px;
+}
+
+.speaker {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.reporter { color: #3498db; }
+.boss { color: #e74c3c; }
+.manager { color: #9b59b6; }
+.child { color: #27ae60; }
+
+.evidence-video {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 15px 0;
+    border: 1px dashed #bbb;
+    text-align: center;
+}
+
+.think-box {
+    background-color: #f2dede;
+    border-left: 4px solid #e74c3c;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.campaign-activity {
+    background-color: #dff0d8;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.reflection-activity {
+    background-color: #d9edf7;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+.word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.word-card {
+    background-color: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.word-card:hover {
+    background-color: #e0e0e0;
+}
+
+.word-card.selected {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.image-placeholder {
+    background-color: #eee;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    border-radius: 5px;
+    color: #777;
+}
+
+footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #777;
+}
+
+/* 저장 성공 애니메이션을 위한 스타일 */
+@keyframes saveSuccess {
+    0% { background-color: #3498db; }
+    50% { background-color: #2ecc71; }
+    100% { background-color: #3498db; }
+}
+
+.save-success {
+    animation: saveSuccess 1s;
+}
+
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .activity-container {
+        padding: 15px;
+    }
+} 
