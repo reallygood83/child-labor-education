@@ -109,6 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // 이미지 팝업 기능 초기화
+    initImagePopup();
 });
 
 // 로그인 요청 함수
@@ -229,41 +232,55 @@ function showSaveFormatDialog() {
     });
 }
 
-// 이미지 팝업 기능
-const modal = document.getElementById('imageModal');
-const modalImg = document.getElementById('modalImage');
-const closeBtn = document.getElementsByClassName('close')[0];
+// 이미지 팝업 기능 초기화
+function initImagePopup() {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const closeBtn = document.getElementsByClassName('close')[0];
 
-// 모든 이미지와 크게 보기 버튼에 이벤트 리스너 추가
-document.querySelectorAll('.content-image, .view-full-btn').forEach(element => {
-    element.addEventListener('click', function(e) {
-        if (e.target.classList.contains('view-full-btn')) {
-            // 크게 보기 버튼 클릭 시 해당 이미지의 src 가져오기
-            const img = e.target.parentElement.querySelector('.content-image');
-            modalImg.src = img.src;
-        } else {
-            // 이미지 클릭 시 해당 이미지의 src 가져오기
-            modalImg.src = e.target.src;
-        }
-        modal.style.display = 'block';
+    if(!modal || !modalImg || !closeBtn) {
+        console.error('모달 요소를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 모든 이미지와 크게 보기 버튼에 이벤트 리스너 추가
+    document.querySelectorAll('.content-image, .view-full-btn').forEach(element => {
+        element.addEventListener('click', function(e) {
+            console.log('이미지 또는 버튼 클릭됨', e.target);
+            if (e.target.classList.contains('view-full-btn')) {
+                // 크게 보기 버튼 클릭 시 해당 이미지의 src 가져오기
+                const img = e.target.parentElement.querySelector('.content-image');
+                console.log('찾은 이미지:', img);
+                if(img) {
+                    modalImg.src = img.src;
+                    modal.style.display = 'block';
+                }
+            } else {
+                // 이미지 클릭 시 해당 이미지의 src 가져오기
+                modalImg.src = e.target.src;
+                modal.style.display = 'block';
+            }
+        });
     });
-});
 
-// 닫기 버튼 클릭 시 모달 닫기
-closeBtn.addEventListener('click', function() {
-    modal.style.display = 'none';
-});
-
-// 모달 바깥 클릭 시 모달 닫기
-modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
+    // 닫기 버튼 클릭 시 모달 닫기
+    closeBtn.addEventListener('click', function() {
         modal.style.display = 'none';
-    }
-});
+    });
 
-// ESC 키로 모달 닫기
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modal.style.display === 'block') {
-        modal.style.display = 'none';
-    }
-}); 
+    // 모달 바깥 클릭 시 모달 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            modal.style.display = 'none';
+        }
+    });
+
+    console.log('이미지 팝업 기능 초기화 완료');
+} 
